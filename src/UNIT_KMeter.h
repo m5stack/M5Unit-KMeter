@@ -7,12 +7,19 @@
 class UNIT_KMeter 
 {
 private:
-  uint8_t _addr;
   TwoWire* _wire;
+  uint8_t _addr;
   float _temperature;
+  float _internal_temp;
+
 public:
+
   void begin(TwoWire* wire = &Wire, uint8_t addr = 0x66);
+
+  bool getRawData(uint8_t* result, size_t len = 4);
+
   float getTemperature(void);
+  float getInternalTemp(void);
 };
 
 #endif

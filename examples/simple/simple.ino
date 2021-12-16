@@ -14,6 +14,7 @@ void setup(void)
   //Wire.begin(21, 22, 400000L);
 
   sensor.begin();
+  //sensor.begin(&Wire, 0x66);
 
   display.setTextSize(2);
   if (display.width() < display.height())
@@ -26,9 +27,23 @@ void loop(void)
 {
   delay(100);
   float temperature = sensor.getTemperature();
+  display.setCursor(display.width()/2 - 64, (display.height()-display.fontHeight()*3)/2);
+  display.printf("Tmp:%7.2f ", temperature);
 
-  display.setCursor(display.width()/2 - 64, display.height()/2);
-  display.printf("Temp:%4.2f ", temperature);
+  float internaltemp = sensor.getInternalTemp();
+  display.setCursor(display.width()/2 - 64, (display.height()-display.fontHeight())/2);
+  display.printf("In:%8.4f ", internaltemp);
 
-  ESP_LOGI("loop", "%4.2f", temperature);
+  uint8_t raw[4];
+  display.setCursor(display.width()/2 - 64, (display.height()+display.fontHeight())/2);
+  if (sensor.getRawData(raw))
+  {
+    display.printf("%02x %02x %02x %02x", raw[0], raw[1], raw[2], raw[3]);
+  }
+  else
+  {
+    display.print(" I2C error ");
+  }
+
+  ESP_LOGI("loop", "%4.2f , %4.4f  %02x %02x %02x %02x", temperature, internaltemp, raw[0], raw[1], raw[2], raw[3]);
 }

@@ -1,12 +1,14 @@
-
 #include <Arduino.h>
-
 #include <UNIT_KMeter.h>
 #include <M5GFX.h>
 #include <stdlib.h>
 #include <alloca.h>
-
 #include <esp_log.h>
+
+
+static constexpr size_t avg_count = 1 << 5;
+static constexpr size_t delay_msec = 50;
+
 
 static float* tempdata_buf;
 static size_t tempdata_count;
@@ -15,10 +17,6 @@ static int graph_height;
 static int graph_y_offset;
 static float min_temp;
 static float max_temp;
-
-static constexpr size_t avg_count = 20;
-static constexpr size_t delay_msec = 50;
-
 static float avg_buf[avg_count];
 static size_t avg_index = 0;
 
@@ -35,6 +33,7 @@ void setup(void)
   //Wire.begin(21, 22, 400000L);
 
   sensor.begin();
+  //sensor.begin(&Wire, 0x66);
 
   display.clear();
   display.setEpdMode(epd_mode_t::epd_fast);
@@ -58,7 +57,7 @@ void setup(void)
     canvas[i].setTextColor(TFT_LIGHTGRAY);
   }
 
-  tempdata_count = display.width() + avg_count + 1;
+  tempdata_count = display.width() + 1;
   tempdata_buf = (float*)malloc(tempdata_count * sizeof(float));
 
   float temperature = sensor.getTemperature();
@@ -85,9 +84,8 @@ void drawGraph(void)
     if (min_t > t) { min_t = t; }
     if (max_t < t) { max_t = t; }
   }
-  float diff = (max_t - min_t) + 1;
-  min_temp = (min_temp + min_t - (diff / 20)) / 2;
-  max_temp = (max_temp + max_t + (diff / 20)) / 2;
+  min_temp = (min_temp + (min_t - 0.5f)) / 2;
+  max_temp = (max_temp + (max_t + 0.5f)) / 2;
 
   float magnify = (float)graph_height / (max_temp - min_temp);
 
@@ -153,6 +151,7 @@ void drawGraph(void)
 
 void loop(void)
 {
+//float temperature = sensor.getInternalTemp();
   float temperature = sensor.getTemperature();
 
   avg_buf[avg_index] = temperature;
@@ -160,10 +159,12 @@ void loop(void)
   float avg_temp = 0;
   for (size_t i = 0; i < avg_count; ++i)
   {
-    avg_temp += avg_buf[i];
+    size_t k = abs((int)(i - avg_index) * 2 + 1);
+    if (k > avg_count) { k = avg_count * 2 - k; }
+    avg_temp += avg_buf[i] * k / avg_count;
   }
 
-  tempdata_buf[tempdata_idx] = avg_temp / avg_count;
+  tempdata_buf[tempdata_idx] = 2 * avg_temp / avg_count;
   if (++tempdata_idx >= tempdata_count)
   {
     tempdata_idx = 0;
@@ -176,7 +177,7 @@ void loop(void)
   uint32_t msec = millis();
   if (msec - prev_msec < delay_msec)
   {
-    ESP_LOGI("loop", "%2.2f", temperature);
+    ESP_LOGI("loop", "%5.2f", temperature);
     m5gfx::delay(delay_msec - (msec - prev_msec));
   }
   prev_msec = msec;
