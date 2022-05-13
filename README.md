@@ -6,8 +6,8 @@ Contains case programs of M5Stack UNIT Kmeter.
 
 ## Related Link
 
-[Docment & Datasheet - KMeter UNIT](https://docs.m5stack.com/en/unit/kmeter)
+- [Document & Datasheet - KMeter UNIT](https://docs.m5stack.com/en/unit/kmeter)
 
 ## License
 
-[UNIT_KMeter - MIT](LICENSE)
+- [UNIT_KMeter - MIT](LICENSE)
