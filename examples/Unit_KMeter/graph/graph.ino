@@ -1,3 +1,18 @@
+/*
+*******************************************************************************
+* Copyright (c) 2021 by M5Stack
+*                  Equipped with M5Devices sample source code
+*                          配套  M5Devices 示例源代码
+* Visit for more information: https://docs.m5stack.com/en/unit/kmeter
+* 获取更多资料请访问: https://docs.m5stack.com/zh_CN/unit/kmeter
+*
+* Product: kmeter.  热电偶传感器
+* date: 2022/7/6
+*******************************************************************************
+  Please connect to Port A(22、21),Read temperature, humidity and atmospheric
+  pressure and display them on the display screen
+  在屏幕上输出热电偶温度及内部温度
+*/
 #include <Arduino.h>
 #include <M5GFX.h>
 #include <M5_KMeter.h>
