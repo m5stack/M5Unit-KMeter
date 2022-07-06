@@ -1,5 +1,5 @@
 {
-  "name": "M5Unit_KMeter",
+  "name": "",
   "description": "Library for M5Stack UNIT KMeter",
   "keywords": "M5Stack UNIT KMeter",
   "authors": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/m5stack/M5Unit_KMeter.git"
+    "url": "https://github.com/m5stack/M5Unit-KMeter.git"
   },
   "version": "0.0.1",
   "frameworks": "arduino",
