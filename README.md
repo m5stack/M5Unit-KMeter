@@ -2,7 +2,7 @@
 
 ## Overview
 
-Contains case programs of M5Stack UNIT Kmeter. 
+Contains case programs of M5Stack UNIT KMeter. 
 
 ## Related Link
 

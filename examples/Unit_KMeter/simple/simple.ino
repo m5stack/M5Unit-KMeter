@@ -6,7 +6,7 @@
 * Visit for more information: https://docs.m5stack.com/en/unit/kmeter
 * 获取更多资料请访问: https://docs.m5stack.com/zh_CN/unit/kmeter
 *
-* Product: kmeter.  热电偶传感器
+* Product: KMeter.  热电偶传感器
 * date: 2022/7/6
 *******************************************************************************
   Thermocouple and internal temperature output on screen and serial port

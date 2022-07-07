@@ -10,8 +10,8 @@
     "type": "git",
     "url": "https://github.com/m5stack/M5Unit-KMeter.git"
   },
-  "version": "0.0.1",
+  "version": "0.0.2",
   "frameworks": "arduino",
-  "headers": "UNIT_KMeter.h",
+  "headers": "M5_KMeter.h",
   "platforms": "espressif32"
 }

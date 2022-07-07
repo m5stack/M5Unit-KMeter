@@ -1,5 +1,6 @@
 #include "M5_KMeter.h"
 
+/*! @brief Initialize the Unit KMeter.*/
 void M5_KMeter::begin(TwoWire* wire, uint8_t addr) {
     _wire          = wire;
     _addr          = addr;
@@ -7,6 +8,8 @@ void M5_KMeter::begin(TwoWire* wire, uint8_t addr) {
     _internal_temp = 0.0f;
 }
 
+/*! @brief Read raw data.
+    @return True if the read was successful, otherwise false.. */
 bool M5_KMeter::getRawData(uint8_t* result, size_t len) {
     if (!_wire->requestFrom((int)_addr, len)) {
         return false;
@@ -17,6 +20,8 @@ bool M5_KMeter::getRawData(uint8_t* result, size_t len) {
     return true;
 }
 
+/*! @brief Read temperature data.
+    @return temperature data.. */
 float M5_KMeter::getTemperature(void) {
     float result = _temperature;
     if (_wire->requestFrom((int)_addr, 2)) {
@@ -30,6 +35,8 @@ float M5_KMeter::getTemperature(void) {
     return result;
 }
 
+/*! @brief Read internal temperature data.
+    @return internal temperature data.. */
 float M5_KMeter::getInternalTemp(void) {
     float result = _internal_temp;
     if (_wire->requestFrom((int)_addr, 4)) {

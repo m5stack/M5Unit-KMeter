@@ -1,5 +1,13 @@
-#ifndef __M5_KMETER_H
-#define __M5_KMETER_H
+/*!
+ * @brief An thermocouple sensor with I2C communication From M5Stack
+ * @copyright Copyright (c) 2022 by M5Stack[https://m5stack.com]
+ *
+ * @Links [Unit KMeter](https://docs.m5stack.com/en/unit/kmeter)
+ * @version  V0.0.1
+ * @date  2022-07-07
+ */
+#ifndef _M5_KMETER_H_
+#define _M5_KMETER_H_
 
 #include <Arduino.h>
 #include <Wire.h>
