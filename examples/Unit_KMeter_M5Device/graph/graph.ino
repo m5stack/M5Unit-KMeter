@@ -7,7 +7,7 @@
 * 获取更多资料请访问: https://docs.m5stack.com/zh_CN/unit/kmeter
 *
 * Product: KMeter.  热电偶传感器
-* date: 2022/7/6
+* Date: 2022/7/6
 *******************************************************************************
   Output thermocouple temperature and internal temperature on the screen
   在屏幕上输出热电偶温度及内部温度
