@@ -26,6 +26,8 @@ class M5_KMeter {
 
     float getTemperature(void);
     float getInternalTemp(void);
+
+    bool changeAddr(uint8_t new_i2c_addr);
 };
 
 #endif

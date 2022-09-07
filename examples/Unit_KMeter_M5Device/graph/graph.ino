@@ -40,7 +40,7 @@ M5Canvas canvas[2];
 void setup(void) {
     display.begin();
 
-    Wire.begin(SDA, SCL, 400000L);
+    Wire.begin((int)SDA, (int)SCL, 400000L);
     // Wire.begin(21, 22, 400000L);
 
     sensor.begin();

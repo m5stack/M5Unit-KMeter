@@ -55,3 +55,19 @@ float M5_KMeter::getInternalTemp(void) {
     }
     return result;
 }
+
+/*! @brief Change the I2C address of the unit.
+    @brief The address is stored even when the power is turned off.
+    @param new_i2c_addr New I2C address (0x08 ~ 0x77)
+    @return true:success / false:failure
+    @attention When the power is turned back on, it will operate at the new address. */
+bool M5_KMeter::changeAddr(uint8_t new_i2c_addr) {
+    if (new_i2c_addr < 8 || new_i2c_addr > 0x77) {
+        return false;
+    }
+
+    uint8_t buf[] = {0x08, new_i2c_addr, (uint8_t)~new_i2c_addr};
+    _wire->beginTransmission((int)_addr);
+    _wire->write(buf, sizeof(buf));
+    return (0 == _wire->endTransmission());
+}
