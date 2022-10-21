@@ -28,17 +28,32 @@ void setup(void) {
     // change I2C addr.
     // ( When the unit is turned back on, it will operate with the new I2C address. )
 //  sensor.changeAddr(0x60);
+
+    // set sleep time. (5 second)
+    sensor.setSleepTime(5);
 }
 
 void loop(void) {
-    delay(100);
-    // get sensor temperature.
-    float temperature = sensor.getTemperature();
 
-    // get unit internal temperature.
-    float internaltemp = sensor.getInternalTemp();
+    // Sensor deep sleep.
+    // (Number of seconds set by the setSleepTime function)
+    sensor.sleep();
 
-    printf("%3.2f  /  %3.2f \n", temperature, internaltemp);
+    delay(5000);
+
+    // data read from unit.
+    if (sensor.update()) {
+
+        // get sensor temperature.
+        float temperature = sensor.getTemperature();
+
+        // get unit internal temperature.
+        float internaltemp = sensor.getInternalTemp();
+
+        printf("%3.2f  /  %3.2f \n", temperature, internaltemp);
+    } else {
+        printf("error %d \n", sensor.getError());
+    }
 }
 ```
 

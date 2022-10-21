@@ -6,62 +6,59 @@ void M5_KMeter::begin(TwoWire *wire, uint8_t addr) {
     _addr          = addr;
     _temperature   = 0.0f;
     _internal_temp = 0.0f;
+    _latest_error  = err_unknown;
+}
+
+/*! @brief Get values from the unit and update temperature data.
+    @return True if the read was successful, otherwise false.. */
+bool M5_KMeter::update(void) {
+    uint8_t read_data[4];
+    error_code_t err = err_i2c_fail;
+    if (getRawData(read_data, sizeof(read_data))) {
+        int16_t tmp = read_data[0] << 8 | read_data[1];
+
+        _temperature = 0.25f * (tmp >> 2);
+
+        tmp = read_data[2] << 8 | read_data[3];
+
+        _internal_temp = 0.0625f * (tmp >> 4);
+
+        int fault_flg = read_data[3] & 7;
+        switch (fault_flg) {
+            case 0:
+                err = (read_data[1] & 1) ? err_unknown : err_ok;
+                break;
+            case 1:
+                err = err_open_circuit;
+                break;
+            case 2:
+                err = err_short_to_gnd;
+                break;
+            case 4:
+                err = err_short_to_vcc;
+                break;
+            default:
+                err = err_unknown;
+                break;
+        }
+        if (err == 0 && ((read_data[1] & 1) == 0)) {
+        }
+    }
+    _latest_error = err;
+    return (err == err_ok);
 }
 
 /*! @brief Read raw data.
-    @return True if the read was successful, otherwise false.. */
+    @return True if the read was successful, otherwise false. */
 bool M5_KMeter::getRawData(uint8_t *result, size_t len) {
-    if (!_wire->requestFrom((int)_addr, len)) {
-        return false;
-    }
-
-    _wire->readBytes(result, len);
-
-    return true;
-}
-
-/*! @brief Read temperature data.
-    @return temperature data. */
-float M5_KMeter::getTemperature(void) {
-    float result = _temperature;
     _wire->beginTransmission((int)_addr);
     _wire->write(0);
-    if (0 == _wire->endTransmission(false)) {
-        if (_wire->requestFrom((int)_addr, 2)) {
-            int16_t t = (_wire->read() << 8);
-            t |= _wire->read();
-            if (0 == (t & 1)) {
-                result       = 0.25f * (t >> 2);
-                _temperature = result;
-            }
-        }
+    if (0 == _wire->endTransmission(false) &&
+        _wire->requestFrom((int)_addr, len) &&
+        (len == _wire->readBytes(result, len))) {
+        return true;
     }
-    return result;
-}
-
-/*! @brief Read internal temperature data.
-    @return internal temperature data. */
-float M5_KMeter::getInternalTemp(void) {
-    float result = _internal_temp;
-    _wire->beginTransmission((int)_addr);
-    _wire->write(0);
-    if (0 == _wire->endTransmission(false)) {
-        if (_wire->requestFrom((int)_addr, 4)) {
-            int16_t t = (_wire->read() << 8);
-            t |= _wire->read();
-            if (0 == (t & 1)) {
-                _temperature = 0.25f * (t >> 2);
-            }
-
-            t = (_wire->read() << 8);
-            t |= _wire->read();
-            if (0 == (t & 7)) {
-                result         = 0.0625f * (t >> 4);
-                _internal_temp = result;
-            }
-        }
-    }
-    return result;
+    return false;
 }
 
 /*! @brief Sets the number of sleep seconds. (Configure only, do not execute.)

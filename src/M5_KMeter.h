@@ -3,8 +3,8 @@
  * @copyright Copyright (c) 2022 by M5Stack[https://m5stack.com]
  *
  * @Links [Unit KMeter](https://docs.m5stack.com/en/unit/kmeter)
- * @version  V0.0.2
- * @date  2022-07-07
+ * @version  V0.0.4
+ * @date  2022-10-21
  */
 #ifndef _M5_KMETER_H_
 #define _M5_KMETER_H_
@@ -13,24 +13,49 @@
 #include <Wire.h>
 
 class M5_KMeter {
-   private:
-    TwoWire* _wire;
-    uint8_t _addr;
-    float _temperature;
-    float _internal_temp;
-
    public:
+    enum error_code_t {
+        err_ok,
+        err_unknown,
+        err_i2c_fail,
+        err_open_circuit,
+        err_short_to_gnd,
+        err_short_to_vcc,
+    };
+
     void begin(TwoWire* wire = &Wire, uint8_t addr = 0x66);
 
-    bool getRawData(uint8_t* result, size_t len = 4);
+    bool update(void);
 
-    float getTemperature(void);
-    float getInternalTemp(void);
+    /*! @brief Read temperature data.
+        @return temperature data. */
+    float getTemperature(void) const {
+        return _temperature;
+    }
+
+    /*! @brief Read internal temperature data.
+        @return internal temperature data. */
+    float getInternalTemp(void) const {
+        return _internal_temp;
+    }
+
+    error_code_t getError(void) const {
+        return _latest_error;
+    }
 
     bool setSleepTime(uint16_t second);
     bool sleep(bool scl_low_wakeup = false);
 
     bool changeAddr(uint8_t new_i2c_addr);
+
+    bool getRawData(uint8_t* result, size_t len = 4);
+
+   private:
+    TwoWire* _wire;
+    float _temperature;
+    float _internal_temp;
+    uint8_t _addr;
+    error_code_t _latest_error;
 };
 
 #endif

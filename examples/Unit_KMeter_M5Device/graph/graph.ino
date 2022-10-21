@@ -166,35 +166,58 @@ void drawGraph(void) {
 }
 
 void loop(void) {
-    // float temperature = sensor.getInternalTemp();
-    float temperature = sensor.getTemperature();
+    if (sensor.update()) {
+        // float temperature = sensor.getInternalTemp();
+        float temperature = sensor.getTemperature();
 
-    avg_buf[avg_index] = temperature;
-    if (++avg_index >= avg_count) {
-        avg_index = 0;
-    }
-    float avg_temp = 0;
-    for (size_t i = 0; i < avg_count; ++i) {
-        size_t k = abs((int)(i - avg_index) * 2 + 1);
-        if (k > avg_count) {
-            k = avg_count * 2 - k;
+        avg_buf[avg_index] = temperature;
+        if (++avg_index >= avg_count) {
+            avg_index = 0;
         }
-        avg_temp += avg_buf[i] * k / avg_count;
-    }
+        float avg_temp = 0;
+        for (size_t i = 0; i < avg_count; ++i) {
+            size_t k = abs((int)(i - avg_index) * 2 + 1);
+            if (k > avg_count) {
+                k = avg_count * 2 - k;
+            }
+            avg_temp += avg_buf[i] * k / avg_count;
+        }
 
-    tempdata_buf[tempdata_idx] = 2 * avg_temp / avg_count;
-    if (++tempdata_idx >= tempdata_count) {
-        tempdata_idx = 0;
-    }
+        tempdata_buf[tempdata_idx] = 2 * avg_temp / avg_count;
+        if (++tempdata_idx >= tempdata_count) {
+            tempdata_idx = 0;
+        }
 
-    drawGraph();
-    display.drawFloat(temperature, 2, display.width(), 0);
+        drawGraph();
+        display.drawFloat(temperature, 2, display.width(), 0);
 
-    static uint32_t prev_msec;
-    uint32_t msec = millis();
-    if (msec - prev_msec < delay_msec) {
-        ESP_LOGI("loop", "%5.2f", temperature);
-        m5gfx::delay(delay_msec - (msec - prev_msec));
+        static uint32_t prev_msec;
+        uint32_t msec = millis();
+        if (msec - prev_msec < delay_msec) {
+            ESP_LOGI("loop", "%6.2f", temperature);
+            m5gfx::delay(delay_msec - (msec - prev_msec));
+        }
+        prev_msec = msec;
+    } else {
+        const char* err_msg;
+        switch (sensor.getError()) {
+            case M5_KMeter::error_code_t::err_i2c_fail:
+                err_msg = "I2C ERR";
+                break;
+            case M5_KMeter::error_code_t::err_unknown:
+                err_msg = "UNKNOWN";
+                break;
+            case M5_KMeter::error_code_t::err_open_circuit:
+                err_msg = "OPEN";
+                break;
+            case M5_KMeter::error_code_t::err_short_to_gnd:
+                err_msg = "GND";
+                break;
+            case M5_KMeter::error_code_t::err_short_to_vcc:
+                err_msg = "VCC";
+                break;
+        }
+        display.drawString(err_msg, display.width(), 0);
+        delay(delay_msec);
     }
-    prev_msec = msec;
 }
