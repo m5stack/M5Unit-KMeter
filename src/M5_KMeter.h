@@ -27,6 +27,9 @@ class M5_KMeter {
     float getTemperature(void);
     float getInternalTemp(void);
 
+    bool setSleepTime(uint16_t second);
+    bool sleep(bool scl_low_wakeup = false);
+
     bool changeAddr(uint8_t new_i2c_addr);
 };
 
