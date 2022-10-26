@@ -13,13 +13,14 @@ void M5_KMeter::begin(TwoWire *wire, uint8_t addr) {
     @return True if the read was successful, otherwise false.. */
 bool M5_KMeter::update(void) {
     uint8_t read_data[6];
-    error_code_t err = err_i2c_fail;
-    int retry        = 3;
+    int retry = 3;
     while ((!getRawData(read_data, sizeof(read_data)) ||
             read_data[4] != reg_0x04_id_h || read_data[5] != reg_0x05_id_l) &&
-           --retry);
+           --retry)
+        ;
+    error_code_t err = err_i2c_fail;
     if (retry != 0) {
-        int16_t tmp = read_data[2] << 8 | read_data[3];
+        int16_t tmp    = read_data[2] << 8 | read_data[3];
         _internal_temp = 0.0625f * (tmp >> 4);
 
         switch (read_data[3] & 7) {
@@ -40,7 +41,7 @@ bool M5_KMeter::update(void) {
                 break;
         }
         if (err == err_ok) {
-            tmp = read_data[0] << 8 | read_data[1];
+            tmp          = read_data[0] << 8 | read_data[1];
             _temperature = 0.25f * (tmp >> 2);
         }
     }
