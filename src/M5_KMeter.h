@@ -14,6 +14,8 @@
 
 class M5_KMeter {
    public:
+    static constexpr const uint8_t reg_0x04_id_h = 0x31;
+    static constexpr const uint8_t reg_0x05_id_l = 0x85;
     enum error_code_t {
         err_ok,
         err_unknown,
@@ -39,6 +41,8 @@ class M5_KMeter {
         return _internal_temp;
     }
 
+    /*! @brief Get the error in the latest update run
+        @return error code. */
     error_code_t getError(void) const {
         return _latest_error;
     }

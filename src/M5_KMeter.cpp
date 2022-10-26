@@ -12,19 +12,17 @@ void M5_KMeter::begin(TwoWire *wire, uint8_t addr) {
 /*! @brief Get values from the unit and update temperature data.
     @return True if the read was successful, otherwise false.. */
 bool M5_KMeter::update(void) {
-    uint8_t read_data[4];
+    uint8_t read_data[6];
     error_code_t err = err_i2c_fail;
-    if (getRawData(read_data, sizeof(read_data))) {
-        int16_t tmp = read_data[0] << 8 | read_data[1];
-
-        _temperature = 0.25f * (tmp >> 2);
-
-        tmp = read_data[2] << 8 | read_data[3];
-
+    int retry        = 3;
+    while ((!getRawData(read_data, sizeof(read_data)) ||
+            read_data[4] != reg_0x04_id_h || read_data[5] != reg_0x05_id_l) &&
+           --retry);
+    if (retry != 0) {
+        int16_t tmp = read_data[2] << 8 | read_data[3];
         _internal_temp = 0.0625f * (tmp >> 4);
 
-        int fault_flg = read_data[3] & 7;
-        switch (fault_flg) {
+        switch (read_data[3] & 7) {
             case 0:
                 err = (read_data[1] & 1) ? err_unknown : err_ok;
                 break;
@@ -41,7 +39,9 @@ bool M5_KMeter::update(void) {
                 err = err_unknown;
                 break;
         }
-        if (err == 0 && ((read_data[1] & 1) == 0)) {
+        if (err == err_ok) {
+            tmp = read_data[0] << 8 | read_data[1];
+            _temperature = 0.25f * (tmp >> 2);
         }
     }
     _latest_error = err;
@@ -65,7 +65,7 @@ bool M5_KMeter::getRawData(uint8_t *result, size_t len) {
     @brief The set values are stored in the unit's NVS and restored at wake-up.
     @param second Number of seconds between sleep execution and wake-up.
     @return true:success / false:failure
-    @attention (Features added in firmware v0.0.3) */
+    @attention (Features added in firmware v1.0) */
 bool M5_KMeter::setSleepTime(uint16_t second) {
     uint8_t buf[] = {0x0E, (uint8_t)(second >> 8), (uint8_t)second};
     _wire->beginTransmission((int)_addr);
@@ -77,7 +77,7 @@ bool M5_KMeter::setSleepTime(uint16_t second) {
     @brief Specify the number of seconds before wake-up with setSleepTime.
     @param scl_low_wakeup true:Wake up when I2C SCL goes Low.
     @return true:success / false:failure
-    @attention (Features added in firmware v0.0.3) */
+    @attention (Features added in firmware v1.0) */
 bool M5_KMeter::sleep(bool scl_low_wakeup) {
     uint8_t buf[] = {0x10, (uint8_t)(scl_low_wakeup ? 0xEF : 0xEE)};
     _wire->beginTransmission((int)_addr);
