@@ -3,7 +3,7 @@
  * @copyright Copyright (c) 2022 by M5Stack[https://m5stack.com]
  *
  * @Links [Unit KMeter](https://docs.m5stack.com/en/unit/kmeter)
- * @version  V0.0.4
+ * @version  V0.1.1
  * @date  2022-10-21
  */
 #ifndef _M5_KMETER_H_
